@@ -28,10 +28,8 @@ $acButton = static function ($url, $label) use ($acGap) {
 $acLinks = '<div style="margin:10px 0 0;padding:0 0 0 ' . $acGap . '">'
     . $acButton($acReadmeUrl, 'Read Me')
     . ($acGithubUrl !== '' ? $acButton($acGithubUrl, 'GitHub') : '')
-    . '</div>'
-    . ($acForumUrl !== ''
-        ? '<div style="margin:8px 0 0;padding:0 0 0 ' . $acGap . '"><a href="' . $acForumUrl . '" target="_blank" rel="noopener noreferrer">Forum Support Thread</a></div>'
-        : '');
+    . ($acForumUrl !== '' ? $acButton($acForumUrl, 'Forum Support Thread') : '')
+    . '</div>';
 
 return [
     'pluginVersion' => 'v1.0.1',
