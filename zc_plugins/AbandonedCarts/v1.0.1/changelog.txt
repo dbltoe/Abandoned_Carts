@@ -1,6 +1,14 @@
 Abandoned Carts -- changelog
 ============================
 
+v1.0.1
+------
+- Plugin Manager and the readme link the Abandoned Carts support
+  thread on the Zen Cart forum.
+- Fixed: the readme said Abandoned Carts Pro puts its coupon in the
+  last reminder. Pro puts it in the reminder you choose.
+- Upgrade in Plugin Manager; no code, settings, data or email change.
+
 v1.0.0
 ------
 The first release (2026-10-05).

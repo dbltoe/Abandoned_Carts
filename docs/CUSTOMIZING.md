@@ -3,7 +3,7 @@
 ## Wording
 
 Every word of the email and the storefront pages is in
-`zc_plugins/AbandonedCarts/v1.0.0/catalog/includes/languages/english/extra_definitions/lang.abandoned_carts.php`.
+`zc_plugins/AbandonedCarts/v1.0.1/catalog/includes/languages/english/extra_definitions/lang.abandoned_carts.php`.
 Copy a constant into an override language file to change it. The admin text is in the same path under `admin/`.
 
 The reminder's subject and opening line can differ per reminder: define `ABANDONED_CARTS_EMAIL_SUBJECT_2`, `ABANDONED_CARTS_EMAIL_INTRO_2` (and `_3`). Abandoned Carts Pro defines them.

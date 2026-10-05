@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.0.1] - 2026-10-05
+
+### Changed
+
+- Plugin Manager's info box links the Abandoned Carts support thread on the Zen Cart forum, and so does the readme's Support section, with the GitHub repository beside it.
+
+### Fixed
+
+- The readme said Abandoned Carts Pro puts its coupon in the last reminder. Pro puts it in the reminder you choose (Coupon in Reminder Number).
+
+Nothing else changed: no code, settings, data or emails. Upgrade in Plugin Manager: upload the v1.0.1 folder beside v1.0.0, click Upgrade, then Upgrade again on the confirmation screen.
+
 ## [1.0.0] - 2026-10-05
 
 First release.
@@ -13,4 +25,5 @@ First release.
 - Preview Email definition for the reminder.
 - Hooks for Abandoned Carts Pro: up to three reminders, step wording, a coupon (`NOTIFY_ABANDONED_CARTS_BEFORE_COMPOSE`, `NOTIFY_ABANDONED_CARTS_SCHEDULER_END`).
 
+[1.0.1]: https://github.com/dbltoe/Abandoned_Carts/releases/tag/v1.0.1
 [1.0.0]: https://github.com/dbltoe/Abandoned_Carts/releases/tag/v1.0.0

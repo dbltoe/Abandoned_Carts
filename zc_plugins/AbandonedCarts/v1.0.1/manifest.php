@@ -15,10 +15,10 @@
  * @license  GNU General Public License v2.0 (https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
  */
 
-$acPluginDir = 'zc_plugins/AbandonedCarts/v1.0.0/';
+$acPluginDir = 'zc_plugins/AbandonedCarts/v1.0.1/';
 $acReadmeUrl = (defined('DIR_WS_CATALOG') ? DIR_WS_CATALOG : '/') . $acPluginDir . 'readme.html';
 $acGithubUrl = 'https://github.com/dbltoe/Abandoned_Carts';
-$acForumUrl = '';
+$acForumUrl = 'https://www.zen-cart.com/threads/207392';
 
 $acGap = '6px';
 $acButton = static function ($url, $label) use ($acGap) {
@@ -34,7 +34,7 @@ $acLinks = '<div style="margin:10px 0 0;padding:0 0 0 ' . $acGap . '">'
         : '');
 
 return [
-    'pluginVersion' => 'v1.0.0',
+    'pluginVersion' => 'v1.0.1',
     'pluginName' => 'Abandoned Carts',
     'pluginDescription' =>
         'Emails shoppers who left items in their cart, automatically, with a link that puts the cart '
