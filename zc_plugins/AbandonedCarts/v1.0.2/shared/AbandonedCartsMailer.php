@@ -9,8 +9,11 @@
  *   2. the address is on the unsubscribe list         -> unsubscribed
  *   3. an order was placed since (any payment path,
  *      PayPal IPN included)                           -> recovered / ordered
- *   4. guests off, newsletter-only, minimum value     -> excluded
- *   5. the shopper is still clicking around           -> waits
+ *   4. the settings don't allow emailing this shopper
+ *      (guests off, a guest who didn't ask, newsletter-only)
+ *                                                     -> deleted ("forgotten")
+ *   5. under the minimum value                        -> excluded
+ *   6. the shopper is still clicking around           -> waits
  *
  * A cart is marked "sending step n" before zen_mail() and cleared after it, so
  * a run that dies mid-send can't email the same reminder twice: a send that
@@ -80,11 +83,11 @@ class AbandonedCartsMailer
      * @param callable $link  (int cartId, string purpose 'cart'|'unsubscribe'): string, an absolute URL
      * @param callable $money (float amount, string currency): string, converted from the default currency
      * @param callable $send  (array mail: name, email, subject, text, html, cart_id, step): bool, false when the send failed
-     * @return array{locked:bool, sent:int, ordered:int, excluded:int, expired:int, waiting:int, unsubscribed:int, purged:int, errors:string[], extra:string[]}
+     * @return array{locked:bool, sent:int, ordered:int, excluded:int, forgotten:int, expired:int, waiting:int, unsubscribed:int, purged:int, errors:string[], extra:string[]}
      */
     public function run(callable $link, callable $money, callable $send): array
     {
-        $report = ['locked' => false, 'sent' => 0, 'ordered' => 0, 'excluded' => 0, 'expired' => 0, 'waiting' => 0, 'unsubscribed' => 0, 'purged' => 0, 'errors' => [], 'extra' => []];
+        $report = ['locked' => false, 'sent' => 0, 'ordered' => 0, 'excluded' => 0, 'forgotten' => 0, 'expired' => 0, 'waiting' => 0, 'unsubscribed' => 0, 'purged' => 0, 'errors' => [], 'extra' => []];
         $lock = AbandonedCartsCore::fresh($this->db, "SELECT GET_LOCK('" . self::lockName() . "', 0) AS got");
         if ($lock->EOF || (int)$lock->fields['got'] !== 1) {
             $report['locked'] = true;
@@ -144,6 +147,12 @@ class AbandonedCartsMailer
         if ($order !== null) {
             $this->tracker->closeAsOrdered($id, $step, (int)$order['orders_id'], (float)$order['order_total']);
             $report['ordered']++;
+            return;
+        }
+        if ($this->consentProblem($row) !== '') {
+            // Not to be emailed under the settings as they are now: nothing is kept.
+            $this->tracker->delete($id);
+            $report['forgotten']++;
             return;
         }
         $why = $this->exclusion($row);
@@ -245,22 +254,21 @@ class AbandonedCartsMailer
         return $r->EOF ? null : $r->fields;
     }
 
-    /** Why the settings say this cart isn't emailed, or ''. */
-    protected function exclusion(array $row): string
+    /** Why the settings say this shopper may not be emailed (or kept), or ''. */
+    protected function consentProblem(array $row): string
     {
         $guest = (int)$row['is_guest'] === 1 || (int)$row['customers_id'] <= 0;
-        if ($guest && !AbandonedCartsCore::settingOn('ABANDONED_CARTS_EMAIL_GUESTS', true)) {
-            return 'guest; E-Mail Guests is off';
-        }
-        if (AbandonedCartsCore::settingOn('ABANDONED_CARTS_NEWSLETTER_ONLY', false)) {
-            if ($guest) {
-                return 'guest; E-Mail Only Newsletter Subscribers is on';
-            }
+        $newsletter = null;
+        if (!$guest && AbandonedCartsCore::settingOn('ABANDONED_CARTS_NEWSLETTER_ONLY', false)) {
             $r = AbandonedCartsCore::fresh($this->db, "SELECT customers_newsletter FROM " . TABLE_CUSTOMERS . " WHERE customers_id = " . (int)$row['customers_id'] . " LIMIT 1");
-            if ($r->EOF || (string)$r->fields['customers_newsletter'] !== '1') {
-                return 'not a newsletter subscriber';
-            }
+            $newsletter = !$r->EOF && (string)$r->fields['customers_newsletter'] === '1';
         }
+        return AbandonedCartsCore::consentProblem($guest, (int)($row['opted_in'] ?? 0) === 1, $newsletter);
+    }
+
+    /** Why this cart isn't emailed though it may be kept (under the minimum value), or ''. */
+    protected function exclusion(array $row): string
+    {
         $min = (float)AbandonedCartsCore::setting('ABANDONED_CARTS_MIN_VALUE', '0');
         if ($min > 0 && (float)$row['cart_total'] < $min) {
             return 'under the minimum cart value';

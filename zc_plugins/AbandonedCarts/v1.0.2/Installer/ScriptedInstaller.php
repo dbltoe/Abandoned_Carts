@@ -89,6 +89,12 @@ class ScriptedInstaller extends ScriptedInstallBase
         if ($this->acCreateTables() === false) {
             return false;
         }
+        // 1.0.2: whether a guest ticked "Email me a reminder". A table made by
+        // 1.0.0/1.0.1 gets the column here (CREATE TABLE IF NOT EXISTS skips it).
+        if (!$this->acHasColumn(TABLE_ABANDONED_CARTS, 'opted_in')
+            && $this->executeInstallerSql("ALTER TABLE " . TABLE_ABANDONED_CARTS . " ADD opted_in tinyint(1) NOT NULL DEFAULT 0 AFTER is_guest") === false) {
+            return false;
+        }
 
         $this->acLog('Abandoned Carts: installed/upgraded.');
         return true;
@@ -161,6 +167,18 @@ class ScriptedInstaller extends ScriptedInstallBase
      * Tables
      * ----------------------------------------------------------------- */
 
+    protected function acHasColumn(string $table, string $column): bool
+    {
+        $c = AbandonedCartsCore::fresh($this->dbConn, "SHOW COLUMNS FROM " . $table);
+        while (!$c->EOF) {
+            if ($c->fields['Field'] === $column) {
+                return true;
+            }
+            $c->MoveNext();
+        }
+        return false;
+    }
+
     protected function acCreateTables(): bool
     {
         $never = "'" . AbandonedCartsCore::NEVER . "'";
@@ -171,6 +189,7 @@ class ScriptedInstaller extends ScriptedInstallBase
                 session_id varchar(128) NOT NULL DEFAULT '',
                 customers_id int(11) NOT NULL DEFAULT 0,
                 is_guest tinyint(1) NOT NULL DEFAULT 0,
+                opted_in tinyint(1) NOT NULL DEFAULT 0,
                 email varchar(96) NOT NULL DEFAULT '',
                 firstname varchar(64) NOT NULL DEFAULT '',
                 languages_id int(11) NOT NULL DEFAULT 0,
@@ -270,7 +289,7 @@ class ScriptedInstaller extends ScriptedInstallBase
                 'key' => 'ABANDONED_CARTS_EMAIL_GUESTS',
                 'title' => 'E-Mail Guests?',
                 'value' => 'true',
-                'description' => 'One Page Checkout\'s guest checkout: when true, a guest who saved their contact details at checkout and then left is emailed too. When false, only shoppers with an account are.',
+                'description' => 'One Page Checkout\'s guest checkout: when true, a guest who saved their contact details at checkout and then left is emailed too. When false, only shoppers with an account are, and nothing about a guest is kept.',
                 'sort_order' => 50,
                 'set_function' => $yesNo,
             ],
@@ -278,8 +297,16 @@ class ScriptedInstaller extends ScriptedInstallBase
                 'key' => 'ABANDONED_CARTS_NEWSLETTER_ONLY',
                 'title' => 'E-Mail Only Newsletter Subscribers?',
                 'value' => 'false',
-                'description' => 'When true, only customers who have opted in to your newsletter are emailed. Guests never opt in, so none are emailed. Stores that must have consent before sending marketing email (for example in the EU, UK or Canada) should consider true.',
+                'description' => 'When true, only customers who have opted in to your newsletter are emailed, and nothing is kept about anyone else. A guest can\'t subscribe, so a guest is emailed only after ticking the box that Ask Guests Before Reminding? adds. Stores that must have consent before sending marketing email (for example in the EU, UK, Canada or Australia) should consider true.',
                 'sort_order' => 60,
+                'set_function' => $yesNo,
+            ],
+            [
+                'key' => 'ABANDONED_CARTS_GUEST_OPT_IN',
+                'title' => 'Ask Guests Before Reminding?',
+                'value' => 'false',
+                'description' => 'When true, One Page Checkout shows a guest an "Email me a reminder if I leave items in my cart." checkbox with their contact details, never ticked for them. Only a guest who ticks it and saves is recorded and reminded. For stores that need consent first (EU, UK, Canada, Australia).',
+                'sort_order' => 65,
                 'set_function' => $yesNo,
             ],
             [

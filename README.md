@@ -29,7 +29,7 @@ Runs on Zen Cart 1.5.8 through 3.0.0 and PHP 7.4 through 8.5 from one codebase, 
 
 ## Layout
 
-- `zc_plugins/AbandonedCarts/v1.0.1/`: the plugin, exactly as it's uploaded.
+- `zc_plugins/AbandonedCarts/v1.0.2/`: the plugin, exactly as it's uploaded.
 - `readme.html`: a copy of the plugin's readme at the top of the download.
 
 ## License

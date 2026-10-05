@@ -4,7 +4,9 @@
  *
  * A cart is recorded only once the shopper can be emailed: a customer with an
  * account, or a One Page Checkout guest who has saved their contact details.
- * Anonymous carts never reach the database.
+ * Anonymous carts never reach the database, and neither does a shopper the
+ * settings say can't be emailed (AbandonedCartsCore::consentProblem(), checked
+ * by the caller); forget() deletes what was kept before they said no.
  *
  * Identity, as the spikes on _test223 proved it has to be:
  *
@@ -51,7 +53,7 @@ class AbandonedCartsTracker
     /**
      * Record (or update) the shopper's cart.
      *
-     * @param array $shopper  key, session_id, customers_id, is_guest, email, firstname, languages_id, language, currency
+     * @param array $shopper  key, session_id, customers_id, is_guest, opted_in, email, firstname, languages_id, language, currency
      * @param array $snapshot contents, lines, item_count, cart_total
      * @return int the cart record's id, 0 when the shopper can't be emailed
      */
@@ -74,6 +76,7 @@ class AbandonedCartsTracker
             'session_id' => substr((string)($shopper['session_id'] ?? ''), 0, 128),
             'customers_id' => $customerId,
             'is_guest' => $customerId > 0 ? 0 : 1,
+            'opted_in' => $customerId === 0 && !empty($shopper['opted_in']) ? 1 : 0,
             'email' => substr($email, 0, 96),
             'firstname' => substr(trim((string)($shopper['firstname'] ?? '')), 0, 64),
             'languages_id' => (int)($shopper['languages_id'] ?? 0),
@@ -111,6 +114,48 @@ class AbandonedCartsTracker
             . " WHERE " . $other . " AND status = 'open' AND abandoned_carts_id <> " . $id
         );
         return $id;
+    }
+
+    /**
+     * Delete this shopper's open cart record(s) and their history: they're not
+     * to be emailed (a guest who unticked "Email me a reminder", or settings
+     * that rule them out), so nothing about them is kept.
+     *
+     * @return int how many records were deleted
+     */
+    public function forget(array $shopper): int
+    {
+        $where = ["session_key = '" . $this->db->prepare_input((string)($shopper['key'] ?? '-')) . "'"];
+        $customerId = empty($shopper['is_guest']) ? (int)($shopper['customers_id'] ?? 0) : 0;
+        $email = trim((string)($shopper['email'] ?? ''));
+        if ($customerId > 0) {
+            $where[] = 'customers_id = ' . $customerId;
+        } elseif ($email !== '') {
+            $where[] = "email = '" . $this->db->prepare_input($email) . "' AND customers_id = 0";
+        }
+        $ids = [];
+        foreach ($where as $w) {
+            $r = AbandonedCartsCore::fresh($this->db, "SELECT abandoned_carts_id FROM " . TABLE_ABANDONED_CARTS . " WHERE " . $w . " AND status = 'open'");
+            while (!$r->EOF) {
+                $ids[] = (int)$r->fields['abandoned_carts_id'];
+                $r->MoveNext();
+            }
+        }
+        $ids = array_values(array_unique($ids));
+        foreach ($ids as $id) {
+            $this->delete($id);
+        }
+        return count($ids);
+    }
+
+    /** Delete one cart record and its history. */
+    public function delete(int $id): void
+    {
+        if ($id <= 0) {
+            return;
+        }
+        $this->db->Execute("DELETE FROM " . TABLE_ABANDONED_CARTS_EVENTS . " WHERE abandoned_carts_id = " . $id);
+        $this->db->Execute("DELETE FROM " . TABLE_ABANDONED_CARTS . " WHERE abandoned_carts_id = " . $id);
     }
 
     /** The shopper emptied the cart: nothing left to remind them about. */

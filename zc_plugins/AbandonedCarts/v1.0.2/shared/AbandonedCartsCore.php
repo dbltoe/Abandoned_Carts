@@ -23,7 +23,7 @@ if (!defined('IS_ADMIN_FLAG')) {
 
 class AbandonedCartsCore
 {
-    public const VERSION = 'v1.0.1';
+    public const VERSION = 'v1.0.2';
 
     /** The zen_mail() module name: our own, so the email observers touch only our mail. */
     public const MAIL_MODULE = 'abandoned_carts';
@@ -117,6 +117,44 @@ class AbandonedCartsCore
             return self::FREE_STEPS;
         }
         return max(1, min(3, (int)$pro));
+    }
+
+    /**
+     * Why this shopper's cart may NOT be kept (and so never emailed), or ''
+     * when it may. Checked when the cart is recorded and again before every
+     * send, so nothing is stored about a shopper the settings say can't be
+     * emailed, and a record the settings no longer allow is deleted.
+     *
+     *   a guest: E-Mail Guests? must be on; with Ask Guests Before Reminding?
+     *            on they must have ticked the box; with E-Mail Only Newsletter
+     *            Subscribers? on, that tick is the only consent a guest can
+     *            give, so it's required too
+     *   a customer: with E-Mail Only Newsletter Subscribers? on, they must be
+     *            subscribed
+     *
+     * @param bool      $guest      an OPC guest (no account)
+     * @param bool      $optedIn    the guest ticked "Email me a reminder"
+     * @param bool|null $newsletter the customer's customers_newsletter is 1 (null for a guest)
+     */
+    public static function consentProblem(bool $guest, bool $optedIn, ?bool $newsletter): string
+    {
+        if ($guest) {
+            if (!self::settingOn('ABANDONED_CARTS_EMAIL_GUESTS', true)) {
+                return 'guest; E-Mail Guests is off';
+            }
+            $askFirst = self::settingOn('ABANDONED_CARTS_GUEST_OPT_IN', false);
+            if ($askFirst && !$optedIn) {
+                return 'guest did not ask for a reminder';
+            }
+            if (self::settingOn('ABANDONED_CARTS_NEWSLETTER_ONLY', false) && !($askFirst && $optedIn)) {
+                return 'guest; E-Mail Only Newsletter Subscribers is on';
+            }
+            return '';
+        }
+        if (self::settingOn('ABANDONED_CARTS_NEWSLETTER_ONLY', false) && $newsletter !== true) {
+            return 'not a newsletter subscriber';
+        }
+        return '';
     }
 
     /** Hours after the last cart activity that reminder $step (1-based) goes out. */
@@ -241,9 +279,15 @@ class AbandonedCartsCore
         return ['subject' => $subject, 'text' => $text, 'html' => $html];
     }
 
+    /**
+     * The footer: that this is an advertisement (CAN-SPAM's ad disclosure; a
+     * cart reminder is a commercial email), how to unsubscribe, and the
+     * store's postal address.
+     */
     protected static function footerText(string $unsubscribeUrl): string
     {
-        $out = sprintf(self::text('ABANDONED_CARTS_EMAIL_UNSUBSCRIBE_TEXT', 'Don\'t want cart reminders? Unsubscribe: %s'), $unsubscribeUrl);
+        $out = self::adNotice() . "\n"
+            . sprintf(self::text('ABANDONED_CARTS_EMAIL_UNSUBSCRIBE_TEXT', 'Don\'t want cart reminders? Unsubscribe: %s'), $unsubscribeUrl);
         $address = trim(self::text('STORE_NAME_ADDRESS', ''));
         return $address === '' ? $out : $out . "\n\n" . $address;
     }
@@ -252,8 +296,14 @@ class AbandonedCartsCore
     {
         $link = '<a href="' . self::esc($unsubscribeUrl) . '">' . self::esc(self::text('ABANDONED_CARTS_EMAIL_UNSUBSCRIBE_LINK', 'Unsubscribe from cart reminders')) . '</a>';
         $address = trim(self::text('STORE_NAME_ADDRESS', ''));
-        return '<p style="color:#777;font-size:85%">' . $link . '</p>'
+        return '<p style="color:#777;font-size:85%">' . self::esc(self::adNotice()) . '<br>' . $link . '</p>'
             . ($address === '' ? '' : '<p style="color:#777;font-size:85%">' . nl2br(self::esc($address)) . '</p>');
+    }
+
+    /** "This email is an advertisement from Acme." */
+    public static function adNotice(): string
+    {
+        return sprintf(self::text('ABANDONED_CARTS_EMAIL_AD_NOTICE', 'This email is an advertisement from %s.'), self::text('STORE_NAME', 'our store'));
     }
 
     /**

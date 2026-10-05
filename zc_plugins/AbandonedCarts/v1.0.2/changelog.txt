@@ -1,6 +1,18 @@
 Abandoned Carts -- changelog
 ============================
 
+v1.0.2
+------
+- New: Ask Guests Before Reminding? (off). When on, One Page
+  Checkout shows guests an "Email me a reminder if I leave items in
+  my cart." checkbox; only guests who tick it are reminded.
+- Every reminder says it's an advertisement from your store
+  (CAN-SPAM).
+- Nothing is kept about a shopper your settings say can't be
+  emailed (for example a guest with E-Mail Guests? off); such
+  records are deleted at the next scheduler run.
+- The readme covers Australia beside the EU, UK and Canada.
+
 v1.0.1
 ------
 - Plugin Manager and the readme link the Abandoned Carts support

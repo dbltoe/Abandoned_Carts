@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.0.2] - 2026-10-05
+
+### Added
+
+- Ask Guests Before Reminding? (off by default). When on, One Page Checkout shows a guest an "Email me a reminder if I leave items in my cart." checkbox in the contact block, never ticked for them, drawn by a script at `NOTIFY_FOOTER_END` and posted with OPC's own guest Save. Only a guest who ticks it is recorded and reminded; unticking and saving again deletes their record. With E-Mail Only Newsletter Subscribers? on, the tick is the guest's consent. Wording: `ABANDONED_CARTS_OPT_IN_LABEL`.
+- Every reminder says "This email is an advertisement from (store)." above the unsubscribe line, CAN-SPAM's ad disclosure (`ABANDONED_CARTS_EMAIL_AD_NOTICE`).
+- The readme's law section covers Australia (Spam Act 2003) beside the EU, UK and Canada.
+
+### Changed
+
+- Nothing is kept about a shopper the settings say can't be emailed. With E-Mail Guests? off, a guest's email and cart were still recorded (never emailed); now they aren't. Likewise a customer who isn't subscribed under E-Mail Only Newsletter Subscribers?. A record the settings rule out by send time (a setting changed since) is deleted with its history, not marked Not Emailed; the scheduler report counts these as "Deleted, not to be emailed under your settings".
+- The cart table gains `opted_in`, added on upgrade.
+
+Thanks to mprough for the review in the support thread.
+
 ## [1.0.1] - 2026-10-05
 
 ### Changed
@@ -25,5 +40,6 @@ First release.
 - Preview Email definition for the reminder.
 - Hooks for Abandoned Carts Pro: up to three reminders, step wording, a coupon (`NOTIFY_ABANDONED_CARTS_BEFORE_COMPOSE`, `NOTIFY_ABANDONED_CARTS_SCHEDULER_END`).
 
+[1.0.2]: https://github.com/dbltoe/Abandoned_Carts/releases/tag/v1.0.2
 [1.0.1]: https://github.com/dbltoe/Abandoned_Carts/releases/tag/v1.0.1
 [1.0.0]: https://github.com/dbltoe/Abandoned_Carts/releases/tag/v1.0.0

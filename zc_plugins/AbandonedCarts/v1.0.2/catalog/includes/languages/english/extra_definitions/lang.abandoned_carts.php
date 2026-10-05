@@ -22,6 +22,11 @@ $define = [
     'ABANDONED_CARTS_EMAIL_CLOSING' => 'Prices and availability are confirmed at checkout.',
     'ABANDONED_CARTS_EMAIL_UNSUBSCRIBE_TEXT' => 'Don\'t want cart reminders? Unsubscribe: %s',
     'ABANDONED_CARTS_EMAIL_UNSUBSCRIBE_LINK' => 'Unsubscribe from cart reminders',
+    // CAN-SPAM's ad disclosure: a cart reminder is a commercial email. %s is the store's name.
+    'ABANDONED_CARTS_EMAIL_AD_NOTICE' => 'This email is an advertisement from %s.',
+
+    // One Page Checkout, for a guest, with Ask Guests Before Reminding? on.
+    'ABANDONED_CARTS_OPT_IN_LABEL' => 'Email me a reminder if I leave items in my cart.',
 
     // The Return to Your Cart link.
     'ABANDONED_CARTS_RESTORED' => 'Welcome back! Your cart is just as you left it.',

@@ -34,12 +34,14 @@ class AbandonedCartsCapture
     /** The session entry this plugin owns. */
     public const SESSION = 'abandoned_carts';
 
-    /** The plugin's session state, created on first use: key, email, firstname, ordering. */
+    /** The plugin's session state, created on first use: key, email, firstname, newsletter, opted_in, ordering. */
     public static function &state(): array
     {
         if (!isset($_SESSION[self::SESSION]) || !is_array($_SESSION[self::SESSION]) || !isset($_SESSION[self::SESSION]['key'])) {
             $_SESSION[self::SESSION] = ['key' => bin2hex(random_bytes(16)), 'email' => '', 'firstname' => '', 'customers_id' => 0, 'ordering' => false];
         }
+        // Sessions begun under 1.0.1 lack the 1.0.2 entries.
+        $_SESSION[self::SESSION] += ['newsletter' => null, 'opted_in' => false];
         return $_SESSION[self::SESSION];
     }
 
@@ -77,17 +79,20 @@ class AbandonedCartsCapture
         if ($customerId > 0 && (int)$state['customers_id'] !== $customerId) {
             $r = AbandonedCartsCore::fresh(
                 $db,
-                "SELECT customers_email_address, customers_firstname FROM " . TABLE_CUSTOMERS . " WHERE customers_id = " . $customerId . " LIMIT 1"
+                "SELECT customers_email_address, customers_firstname, customers_newsletter FROM " . TABLE_CUSTOMERS . " WHERE customers_id = " . $customerId . " LIMIT 1"
             );
             $state['customers_id'] = $customerId;
             $state['email'] = $r->EOF ? '' : trim((string)$r->fields['customers_email_address']);
             $state['firstname'] = $r->EOF ? '' : trim((string)$r->fields['customers_firstname']);
+            $state['newsletter'] = !$r->EOF && (string)$r->fields['customers_newsletter'] === '1';
         }
         return [
             'key' => (string)$state['key'],
             'session_id' => function_exists('zen_session_id') ? (string)zen_session_id() : '',
             'customers_id' => $customerId,
             'is_guest' => $customerId === 0,
+            'opted_in' => $customerId === 0 && !empty($state['opted_in']),
+            'newsletter' => $customerId > 0 ? $state['newsletter'] === true : null,
             'email' => $customerId > 0 || self::isGuest() ? (string)$state['email'] : '',
             'firstname' => (string)$state['firstname'],
             'languages_id' => (int)($_SESSION['languages_id'] ?? 1),
@@ -96,8 +101,12 @@ class AbandonedCartsCapture
         ];
     }
 
-    /** The guest saved their contact details at checkout. */
-    public static function guestSaved(string $email, string $firstname = ''): void
+    /**
+     * The guest saved their contact details at checkout. $optedIn is their
+     * "Email me a reminder" box when the form carried it (null: not asked on
+     * this save, keep what they said before).
+     */
+    public static function guestSaved(string $email, string $firstname = '', ?bool $optedIn = null): void
     {
         $email = trim(html_entity_decode($email, ENT_QUOTES, defined('CHARSET') ? CHARSET : 'UTF-8'));
         if ($email === '' || !self::validEmail($email)) {
@@ -106,6 +115,9 @@ class AbandonedCartsCapture
         $state = &self::state();
         $state['email'] = $email;
         $state['customers_id'] = 0;
+        if ($optedIn !== null) {
+            $state['opted_in'] = $optedIn;
+        }
         if (trim($firstname) !== '') {
             $state['firstname'] = trim(html_entity_decode($firstname, ENT_QUOTES, defined('CHARSET') ? CHARSET : 'UTF-8'));
         }
@@ -124,6 +136,11 @@ class AbandonedCartsCapture
             return 0;
         }
         $tracker = new AbandonedCartsTracker($db);
+        if (AbandonedCartsCore::consentProblem($shopper['is_guest'], $shopper['opted_in'], $shopper['newsletter']) !== '') {
+            // Not to be emailed: keep nothing, and drop what was kept before.
+            $tracker->forget($shopper);
+            return 0;
+        }
         $products = method_exists($cart, 'get_products') ? (array)$cart->get_products() : [];
         $snapshot = $tracker->snapshot((array)$cart->contents, $products, $shopper['languages_id'], [self::class, 'lineTotal']);
         return $tracker->record($shopper, $snapshot);

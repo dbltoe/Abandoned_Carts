@@ -27,7 +27,7 @@ nav ol{columns:2;column-gap:2em;padding-left:1.4em}
 <body>
 
 <h1>Abandoned Carts for Zen Cart</h1>
-<p class="lead">Version 1.0.1 for Zen Cart 1.5.8 through 3.0.0 on PHP 7.4 through 8.5. Free software (GPL v2) by My Zen Cart Host (dbltoe).</p>
+<p class="lead">Version 1.0.2 for Zen Cart 1.5.8 through 3.0.0 on PHP 7.4 through 8.5. Free software (GPL v2) by My Zen Cart Host (dbltoe).</p>
 
 <nav aria-label="Contents">
 <h2 id="contents">Contents</h2>
@@ -60,11 +60,12 @@ nav ol{columns:2;column-gap:2em;padding-left:1.4em}
 <li>It runs by itself. Once the scheduler is set up there's nothing to send by hand.</li>
 <li>It reaches customers with an account <em>and</em> One Page Checkout guests who gave their email at checkout, the shoppers older tools can't see.</li>
 <li>It stops the moment the shopper orders, empties the cart or unsubscribes, and it waits while they're still clicking around.</li>
-<li>Every email has a one-click unsubscribe link (and the header mail providers use for their own Unsubscribe button) and your store's postal address.</li>
+<li>Every email says it's an advertisement, has a one-click unsubscribe link (and the header mail providers use for their own Unsubscribe button) and your store's postal address.</li>
+<li>For stores that need consent first, it can ask One Page Checkout guests with an "Email me a reminder" checkbox, and remind only those who tick it.</li>
 <li>Customers &gt; Abandoned Carts shows every recorded cart, what was sent, and the orders reminders brought back.</li>
 <li>No template edits, no core edits: it installs and uninstalls from Plugin Manager.</li>
 </ul>
-<p>Carts are recorded only once the shopper can be emailed. A visitor who never logs in or gives an email at checkout isn't stored anywhere.</p>
+<p>Carts are recorded only once the shopper can be emailed, and only when your settings allow emailing them. A visitor who never logs in or gives an email at checkout isn't stored anywhere, and neither is a shopper your settings rule out.</p>
 
 <h2 id="requirements">Requirements</h2>
 <ul>
@@ -105,8 +106,9 @@ nav ol{columns:2;column-gap:2em;padding-left:1.4em}
 <tr><td>Reminder E-Mail, Hours After Last Activity</td><td>1</td><td>How long after the shopper last changed their cart the reminder goes out. 1 to 168.</td></tr>
 <tr><td>Don't Remind About Carts Older Than (Days)</td><td>7</td><td>Carts whose last activity is older than this are never emailed. Stops a stalled scheduler (or turning reminders on) from emailing about stale carts.</td></tr>
 <tr><td>Minimum Cart Value</td><td>0</td><td>Carts worth less are not emailed. In your default currency, with tax when your prices show tax.</td></tr>
-<tr><td>E-Mail Guests?</td><td>true</td><td>Whether One Page Checkout guests who saved their contact details are emailed.</td></tr>
-<tr><td>E-Mail Only Newsletter Subscribers?</td><td>false</td><td>When true, only customers who opted in to your newsletter are emailed, and guests aren't. See <a href="#privacy">Privacy and the law</a>.</td></tr>
+<tr><td>E-Mail Guests?</td><td>true</td><td>Whether One Page Checkout guests who saved their contact details are emailed. When false, nothing about a guest is kept.</td></tr>
+<tr><td>E-Mail Only Newsletter Subscribers?</td><td>false</td><td>When true, only customers who opted in to your newsletter are emailed, and nothing is kept about anyone else. A guest can't subscribe, so a guest is reminded only after ticking the box <em>Ask Guests Before Reminding?</em> adds. See <a href="#privacy">Privacy and the law</a>.</td></tr>
+<tr><td>Ask Guests Before Reminding?</td><td>false</td><td>When true, One Page Checkout shows a guest an "Email me a reminder if I leave items in my cart." checkbox with their contact details, never ticked for them. Only a guest who ticks it and saves is recorded and reminded. See <a href="#opc">One Page Checkout guests</a>.</td></tr>
 <tr><td>Wait While the Shopper Is Still Browsing (Minutes)</td><td>20</td><td>A shopper Who's Online shows clicking in the last this-many minutes isn't emailed yet. 0 turns the check off.</td></tr>
 <tr><td>Keep Cart Records (Days)</td><td>30</td><td>Cart records, guest emails included, are deleted this many days after the cart was last active. 7 to 365.</td></tr>
 <tr><td>Delete Cart Records on Uninstall?</td><td>false</td><td>When false, uninstalling keeps the records, the unsubscribe list, the scheduler key and the link secret.</td></tr>
@@ -117,13 +119,14 @@ nav ol{columns:2;column-gap:2em;padding-left:1.4em}
 </table>
 
 <h2 id="who">Who gets a reminder</h2>
-<p>A cart is recorded when the shopper changes it while the plugin knows their email: a logged-in customer, or a guest who saved their details at checkout. Each change pushes the reminder back, so nobody is emailed while they're still shopping.</p>
+<p>A cart is recorded when the shopper changes it while the plugin knows their email (a logged-in customer, or a guest who saved their details at checkout) and your settings allow emailing them. Each change pushes the reminder back, so nobody is emailed while they're still shopping.</p>
 <p>When the reminder is due, the scheduler checks, in this order, and sends only if every check passes:</p>
 <ol>
 <li>The cart isn't older than <em>Don't Remind About Carts Older Than</em>.</li>
 <li>The address isn't on the unsubscribe list.</li>
 <li>No order has come in from that address since the cart was recorded. This catches every way an order can arrive, PayPal's IPN included.</li>
-<li>The settings allow it: guests, newsletter-only, minimum value.</li>
+<li>The settings allow emailing this shopper: guests, the guest's checkbox, newsletter-only. If they don't (you changed a setting since the cart was recorded), the record is deleted.</li>
+<li>The cart is worth at least the <em>Minimum Cart Value</em>.</li>
 <li>The shopper isn't still clicking around (Who's Online). If they are, it waits and tries again.</li>
 </ol>
 <p>One reminder per cart. A cart closes when the shopper orders (shown as <em>Recovered</em> if a reminder had gone out, else <em>Ordered</em>), empties it, or unsubscribes. A customer who comes back in a new session keeps one cart record, not one per visit.</p>
@@ -131,6 +134,8 @@ nav ol{columns:2;column-gap:2em;padding-left:1.4em}
 <h2 id="opc">One Page Checkout guests</h2>
 <p>With One Page Checkout's guest checkout, a guest's cart is never saved to your database the way a customer's is, and their email exists only after they fill in the contact block and click <strong>Save</strong>. That moment is when Abandoned Carts records them. A guest who types an email and leaves without clicking Save can't be reached by any plugin, because the address never reaches your server.</p>
 <p>If a guest logs in to an account partway through checkout, the cart moves to their account record.</p>
+<h3>Asking guests first</h3>
+<p>With <em>Ask Guests Before Reminding?</em> true, the contact block shows a checkbox just above its Save button: <strong>Email me a reminder if I leave items in my cart.</strong> It's never ticked for the guest. Only a guest who ticks it and clicks Save is recorded. A guest who later unticks it and saves again is forgotten: their cart record and its history are deleted. The box is added by a short script, so the template needs no edits; if the script doesn't run, the box isn't there and the guest isn't recorded. Change its wording with <code>ABANDONED_CARTS_OPT_IN_LABEL</code>.</p>
 <p>This works with One Page Checkout 2.3.6 and later, including 2.7.0. Nothing in One Page Checkout is changed.</p>
 
 <h2 id="link">The Return to Your Cart link</h2>
@@ -150,16 +155,16 @@ nav ol{columns:2;column-gap:2em;padding-left:1.4em}
 </ul>
 
 <h2 id="emails">The email</h2>
-<p>The reminder lists the items with their options and prices, the cart total, the <strong>Return to Your Cart</strong> button, an unsubscribe link and your store's name and address (Configuration &gt; My Store &gt; Store Address and Phone). It's sent through Zen Cart's normal email, so it uses your email template, is archived when email archiving is on, and follows your email settings.</p>
+<p>The reminder lists the items with their options and prices, the cart total, the <strong>Return to Your Cart</strong> button, a line saying it's an advertisement from your store, an unsubscribe link and your store's name and address (Configuration &gt; My Store &gt; Store Address and Phone). It's sent through Zen Cart's normal email, so it uses your email template, is archived when email archiving is on, and follows your email settings.</p>
 <p>Guests have no email preference in your store, so their reminder is sent as HTML. A customer who chose text-only email gets text.</p>
 <p>With <strong>Preview Email</strong> installed, the reminder appears under Tools &gt; Preview Email as <em>Abandoned Carts: Cart Reminder</em>, built by the same code that sends it.</p>
 
 <h2 id="privacy">Privacy and the law</h2>
 <p>We don't give legal advice; here's what the plugin does so you can decide.</p>
 <ul>
-<li><strong>United States (CAN-SPAM):</strong> every reminder has a working unsubscribe and your postal address. Make sure Store Address and Phone is filled in.</li>
-<li><strong>EU and UK (GDPR, PECR), Canada (CASL):</strong> these are stricter about emailing someone who didn't finish an order. Consider <em>E-Mail Only Newsletter Subscribers?</em> true, <em>E-Mail Guests?</em> false, and a short <em>Keep Cart Records</em>, and say in your privacy notice that you may remind shoppers about their cart.</li>
-<li>Guest emails are kept only as long as <em>Keep Cart Records</em> says, and the unsubscribe list never holds an address.</li>
+<li><strong>United States (CAN-SPAM):</strong> a cart reminder is a commercial email. Every reminder says it's an advertisement from your store, has a working unsubscribe, and carries your postal address. Make sure Store Address and Phone is filled in.</li>
+<li><strong>EU and UK (GDPR, PECR), Canada (CASL), Australia (Spam Act 2003):</strong> these need consent before marketing email, and a cart someone didn't finish isn't consent. Set <em>E-Mail Only Newsletter Subscribers?</em> true and <em>Ask Guests Before Reminding?</em> true, so only newsletter subscribers and guests who tick the box are reminded (or <em>E-Mail Guests?</em> false to leave guests out altogether). Keep <em>Keep Cart Records</em> short, and say in your privacy notice that you remind shoppers who ask.</li>
+<li>Nothing is kept about a shopper your settings say can't be emailed, guest emails are kept only as long as <em>Keep Cart Records</em> says, and the unsubscribe list never holds an address.</li>
 </ul>
 
 <h2 id="recover-cart-sales">Recover Cart Sales</h2>
@@ -177,6 +182,7 @@ nav ol{columns:2;column-gap:2em;padding-left:1.4em}
 
 <h2 id="upgrading">Upgrading</h2>
 <p>Upload the new version's folder beside the old one and click <strong>Upgrade</strong> in Plugin Manager. Your settings, records, scheduler key and link secret are kept.</p>
+<p>From 1.0.0 or 1.0.1 to 1.0.2: the new setting <em>Ask Guests Before Reminding?</em> arrives off, so nothing changes until you turn it on. Records your settings already rule out (a guest with <em>E-Mail Guests?</em> false, for example) are deleted the next time the scheduler runs, where 1.0.1 kept them, marked Not Emailed, until <em>Keep Cart Records</em> ran out.</p>
 
 <h2 id="uninstalling">Uninstalling</h2>
 <p>Click <strong>Uninstall</strong> in Plugin Manager. With <em>Delete Cart Records on Uninstall?</em> false (the default), the records, the unsubscribe list, the scheduler key and the link secret are kept, so a later install picks up where it left off and links in emails already sent still work. With it true, all of it is removed. Remove the cron job too.</p>
@@ -187,8 +193,8 @@ nav ol{columns:2;column-gap:2em;padding-left:1.4em}
 <tbody>
 <tr><td>No reminders go out</td><td>Customers &gt; Abandoned Carts shows when the scheduler last ran. Click <strong>Send Due Reminders Now</strong> and read the report. Check Send Reminder E-Mails? and Send E-Mails.</td></tr>
 <tr><td>The scheduler says Forbidden</td><td>The key in your cron job doesn't match the Scheduler Key. Copy the address again from Scheduler Setup.</td></tr>
-<tr><td>A cart shows <em>Not Emailed</em></td><td>Its history says why: a guest with guests off, not a newsletter subscriber, under the minimum value, or stopped by an admin.</td></tr>
-<tr><td>Guests are never recorded</td><td>Guest checkout must be One Page Checkout's, and the guest must click Save on their contact details.</td></tr>
+<tr><td>A cart shows <em>Not Emailed</em></td><td>Its history says why: under the minimum value, or stopped by an admin. (A shopper your settings rule out isn't kept at all.)</td></tr>
+<tr><td>Guests are never recorded</td><td>Guest checkout must be One Page Checkout's, and the guest must click Save on their contact details. Check <em>E-Mail Guests?</em>; with <em>Ask Guests Before Reminding?</em> true, only guests who tick the box are recorded.</td></tr>
 <tr><td>"could not be sent" in the report</td><td>Zen Cart couldn't send the email. Check your email settings; the reminder is retried an hour later.</td></tr>
 </tbody>
 </table>
