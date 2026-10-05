@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Abandoned Carts for Zen Cart: Read Me</title>
+<style>
+:root{--ink:#1d2329;--muted:#55606b;--line:#d8dee4;--panel:#f6f8fa;--link:#0a58ca;--note:#fff8e1;--noteline:#e0c060;--bg:#fff}
+@media (prefers-color-scheme:dark){:root{--ink:#e6e9ec;--muted:#a9b2bb;--line:#3a434c;--panel:#20262c;--link:#7fb2ff;--note:#2e2a1c;--noteline:#7a6a30;--bg:#161b20}}
+body{font:16px/1.6 -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);max-width:52em;margin:0 auto;padding:16px}
+h1{font-size:1.8em;margin:.2em 0}
+h2{font-size:1.35em;margin:2em 0 .5em;padding-bottom:.25em;border-bottom:1px solid var(--line)}
+h3{font-size:1.1em;margin:1.4em 0 .4em}
+a{color:var(--link)}
+code,pre{font-family:Menlo,Consolas,monospace;font-size:.9em;background:var(--panel);border-radius:3px}
+code{padding:.1em .3em;overflow-wrap:anywhere}
+pre{padding:.7em 1em;white-space:pre-wrap;word-break:break-all}
+table{border-collapse:collapse;width:100%;margin:.5em 0 1em}
+th,td{border:1px solid var(--line);padding:.4em .6em;text-align:left;vertical-align:top}
+th{background:var(--panel)}
+.lead{color:var(--muted)}
+.note{background:var(--note);border-left:4px solid var(--noteline);padding:.6em 1em;margin:1em 0}
+nav ol{columns:2;column-gap:2em;padding-left:1.4em}
+@media (max-width:600px){nav ol{columns:1}}
+</style>
+</head>
+<body>
+
+<h1>Abandoned Carts for Zen Cart</h1>
+<p class="lead">Version 1.0.0 for Zen Cart 1.5.8 through 3.0.0 on PHP 7.4 through 8.5. Free software (GPL v2) by My Zen Cart Host (dbltoe).</p>
+
+<nav aria-label="Contents">
+<h2 id="contents">Contents</h2>
+<ol>
+<li><a href="#what">What it does</a></li>
+<li><a href="#requirements">Requirements</a></li>
+<li><a href="#installing">Installing</a></li>
+<li><a href="#scheduler">Setting up the scheduler</a></li>
+<li><a href="#configuration">Configuration</a></li>
+<li><a href="#who">Who gets a reminder</a></li>
+<li><a href="#opc">One Page Checkout guests</a></li>
+<li><a href="#link">The Return to Your Cart link</a></li>
+<li><a href="#unsubscribe">Unsubscribing</a></li>
+<li><a href="#admin">Customers &gt; Abandoned Carts</a></li>
+<li><a href="#emails">The email</a></li>
+<li><a href="#privacy">Privacy and the law</a></li>
+<li><a href="#recover-cart-sales">Recover Cart Sales</a></li>
+<li><a href="#pro">Abandoned Carts Pro</a></li>
+<li><a href="#customizing">Customizing</a></li>
+<li><a href="#upgrading">Upgrading</a></li>
+<li><a href="#uninstalling">Uninstalling</a></li>
+<li><a href="#troubleshooting">Troubleshooting</a></li>
+<li><a href="#support">Support and license</a></li>
+</ol>
+</nav>
+
+<h2 id="what">What it does</h2>
+<p>About seven in ten online carts are left behind. Abandoned Carts emails the shopper a while after they stop, with what they left, the total and a <strong>Return to Your Cart</strong> button that puts the cart back exactly as it was, options and all.</p>
+<ul>
+<li>It runs by itself. Once the scheduler is set up there's nothing to send by hand.</li>
+<li>It reaches customers with an account <em>and</em> One Page Checkout guests who gave their email at checkout, the shoppers older tools can't see.</li>
+<li>It stops the moment the shopper orders, empties the cart or unsubscribes, and it waits while they're still clicking around.</li>
+<li>Every email has a one-click unsubscribe link (and the header mail providers use for their own Unsubscribe button) and your store's postal address.</li>
+<li>Customers &gt; Abandoned Carts shows every recorded cart, what was sent, and the orders reminders brought back.</li>
+<li>No template edits, no core edits: it installs and uninstalls from Plugin Manager.</li>
+</ul>
+<p>Carts are recorded only once the shopper can be emailed. A visitor who never logs in or gives an email at checkout isn't stored anywhere.</p>
+
+<h2 id="requirements">Requirements</h2>
+<ul>
+<li>Zen Cart 1.5.8 through 3.0.0, PHP 7.4 through 8.5.</li>
+<li>Email sending working in your store (Configuration &gt; E-Mail Options &gt; Send E-Mails is true).</li>
+<li>A way to open the scheduler address every 15 minutes: a cron job (cPanel and most hosts have one) or an outside cron service.</li>
+<li>Optional: lat9's One Page Checkout 2.3.6 or later, for guests. Without it, reminders go to customers with an account.</li>
+</ul>
+
+<h2 id="installing">Installing</h2>
+<ol>
+<li>Upload the <code>zc_plugins/AbandonedCarts</code> folder into your store's <code>zc_plugins</code> folder.</li>
+<li>In the admin, open <strong>Modules &gt; Plugin Manager</strong>, select <strong>Abandoned Carts</strong> and click <strong>Install</strong>.</li>
+<li>Set up the scheduler (next section). Nothing is sent until it runs.</li>
+<li>Look over <strong>Configuration &gt; Abandoned Carts</strong>. The defaults are a good start.</li>
+</ol>
+<p>Recording starts at once: carts left from now on are picked up.</p>
+
+<h2 id="scheduler">Setting up the scheduler</h2>
+<p>The scheduler is a storefront address with a secret key. Each time it's opened it sends the reminders that are due. Open it every 15 minutes, so a reminder set for one hour goes out close to on time.</p>
+<p>Your address is shown under <strong>Configuration &gt; Abandoned Carts &gt; Scheduler Key</strong>, and on Customers &gt; Abandoned Carts under <strong>Scheduler Setup</strong>. It looks like this:</p>
+<pre>https://www.example.com/index.php?main_page=abandoned_carts_cron&amp;key=YOUR-KEY</pre>
+<h3>cPanel</h3>
+<p>Open <strong>Cron Jobs</strong>, enter Minute <code>*/15</code> and <code>*</code> for Hour, Day, Month and Weekday, and use this command with your address:</p>
+<pre>curl -fsSL "https://www.example.com/index.php?main_page=abandoned_carts_cron&amp;key=YOUR-KEY" &gt;/dev/null</pre>
+<h3>No cron on your host?</h3>
+<p>Any outside cron service that can open a web address every 15 minutes will do.</p>
+<h3>Checking it</h3>
+<p>Click <strong>Send Due Reminders Now</strong> on Customers &gt; Abandoned Carts. A new tab shows what the run did. The page also shows when the scheduler last ran, and warns when it hasn't run for an hour.</p>
+<div class="note">Keep the key private. Anyone with the address can make the scheduler run (it only ever sends reminders that are due, but still).</div>
+
+<h2 id="configuration">Configuration</h2>
+<p>Under <strong>Configuration &gt; Abandoned Carts</strong>:</p>
+<table>
+<thead><tr><th>Setting</th><th>Default</th><th>What it does</th></tr></thead>
+<tbody>
+<tr><td>Send Reminder E-Mails?</td><td>true</td><td>Turns the emails on or off. Carts are still recorded while it's off, so nothing is missed when you turn it back on.</td></tr>
+<tr><td>Reminder E-Mail, Hours After Last Activity</td><td>1</td><td>How long after the shopper last changed their cart the reminder goes out. 1 to 168.</td></tr>
+<tr><td>Don't Remind About Carts Older Than (Days)</td><td>7</td><td>Carts whose last activity is older than this are never emailed. Stops a stalled scheduler (or turning reminders on) from emailing about stale carts.</td></tr>
+<tr><td>Minimum Cart Value</td><td>0</td><td>Carts worth less are not emailed. In your default currency, with tax when your prices show tax.</td></tr>
+<tr><td>E-Mail Guests?</td><td>true</td><td>Whether One Page Checkout guests who saved their contact details are emailed.</td></tr>
+<tr><td>E-Mail Only Newsletter Subscribers?</td><td>false</td><td>When true, only customers who opted in to your newsletter are emailed, and guests aren't. See <a href="#privacy">Privacy and the law</a>.</td></tr>
+<tr><td>Wait While the Shopper Is Still Browsing (Minutes)</td><td>20</td><td>A shopper Who's Online shows clicking in the last this-many minutes isn't emailed yet. 0 turns the check off.</td></tr>
+<tr><td>Keep Cart Records (Days)</td><td>30</td><td>Cart records, guest emails included, are deleted this many days after the cart was last active. 7 to 365.</td></tr>
+<tr><td>Delete Cart Records on Uninstall?</td><td>false</td><td>When false, uninstalling keeps the records, the unsubscribe list, the scheduler key and the link secret.</td></tr>
+<tr><td>Scheduler Key</td><td>generated</td><td>The secret in the scheduler address. Read-only.</td></tr>
+<tr><td>Link Secret</td><td>generated</td><td>Signs the links in the emails. Read-only; changing it would break every link already sent.</td></tr>
+<tr><td>Scheduler Last Ran</td><td>(set by the scheduler)</td><td>Read-only.</td></tr>
+</tbody>
+</table>
+
+<h2 id="who">Who gets a reminder</h2>
+<p>A cart is recorded when the shopper changes it while the plugin knows their email: a logged-in customer, or a guest who saved their details at checkout. Each change pushes the reminder back, so nobody is emailed while they're still shopping.</p>
+<p>When the reminder is due, the scheduler checks, in this order, and sends only if every check passes:</p>
+<ol>
+<li>The cart isn't older than <em>Don't Remind About Carts Older Than</em>.</li>
+<li>The address isn't on the unsubscribe list.</li>
+<li>No order has come in from that address since the cart was recorded. This catches every way an order can arrive, PayPal's IPN included.</li>
+<li>The settings allow it: guests, newsletter-only, minimum value.</li>
+<li>The shopper isn't still clicking around (Who's Online). If they are, it waits and tries again.</li>
+</ol>
+<p>One reminder per cart. A cart closes when the shopper orders (shown as <em>Recovered</em> if a reminder had gone out, else <em>Ordered</em>), empties it, or unsubscribes. A customer who comes back in a new session keeps one cart record, not one per visit.</p>
+
+<h2 id="opc">One Page Checkout guests</h2>
+<p>With One Page Checkout's guest checkout, a guest's cart is never saved to your database the way a customer's is, and their email exists only after they fill in the contact block and click <strong>Save</strong>. That moment is when Abandoned Carts records them. A guest who types an email and leaves without clicking Save can't be reached by any plugin, because the address never reaches your server.</p>
+<p>If a guest logs in to an account partway through checkout, the cart moves to their account record.</p>
+<p>This works with One Page Checkout 2.3.6 and later, including 2.7.0. Nothing in One Page Checkout is changed.</p>
+
+<h2 id="link">The Return to Your Cart link</h2>
+<p>The button opens your store and puts the cart back as it was: the same products, quantities and options, text options and checkboxes included. Items already in the shopper's current cart are kept as they are. Products you've since disabled or deleted are left out, and the shopper is told how many. Prices are always today's, never the ones in the email.</p>
+<p>A logged-in customer's restored cart is saved to their account. Nobody is ever logged in by the link.</p>
+
+<h2 id="unsubscribe">Unsubscribing</h2>
+<p>Every email has an unsubscribe link. It opens a page that asks for confirmation (the address is shown partly masked), and one click unsubscribes. The email also carries the <code>List-Unsubscribe</code> and one-click headers (RFC 8058), so Gmail, Yahoo and others show their own Unsubscribe button, which unsubscribes straight away.</p>
+<p>The unsubscribe list holds a one-way hash of each address, never the address itself, and only stops cart reminders. Order confirmations and your other emails aren't affected.</p>
+
+<h2 id="admin">Customers &gt; Abandoned Carts</h2>
+<ul>
+<li>The scheduler's health and the <strong>Send Due Reminders Now</strong> button.</li>
+<li>The last 30 days: reminders sent, carts recovered and what those orders were worth.</li>
+<li>Every recorded cart, with counts by status, an email search, and pages of 50.</li>
+<li>Each cart's items, reminders and history (recorded, reminder sent, link clicked, ordered...), with <strong>Stop Reminders for This Cart</strong> while it's open.</li>
+</ul>
+
+<h2 id="emails">The email</h2>
+<p>The reminder lists the items with their options and prices, the cart total, the <strong>Return to Your Cart</strong> button, an unsubscribe link and your store's name and address (Configuration &gt; My Store &gt; Store Address and Phone). It's sent through Zen Cart's normal email, so it uses your email template, is archived when email archiving is on, and follows your email settings.</p>
+<p>Guests have no email preference in your store, so their reminder is sent as HTML. A customer who chose text-only email gets text.</p>
+<p>With <strong>Preview Email</strong> installed, the reminder appears under Tools &gt; Preview Email as <em>Abandoned Carts: Cart Reminder</em>, built by the same code that sends it.</p>
+
+<h2 id="privacy">Privacy and the law</h2>
+<p>We don't give legal advice; here's what the plugin does so you can decide.</p>
+<ul>
+<li><strong>United States (CAN-SPAM):</strong> every reminder has a working unsubscribe and your postal address. Make sure Store Address and Phone is filled in.</li>
+<li><strong>EU and UK (GDPR, PECR), Canada (CASL):</strong> these are stricter about emailing someone who didn't finish an order. Consider <em>E-Mail Only Newsletter Subscribers?</em> true, <em>E-Mail Guests?</em> false, and a short <em>Keep Cart Records</em>, and say in your privacy notice that you may remind shoppers about their cart.</li>
+<li>Guest emails are kept only as long as <em>Keep Cart Records</em> says, and the unsubscribe list never holds an address.</li>
+</ul>
+
+<h2 id="recover-cart-sales">Recover Cart Sales</h2>
+<p>Abandoned Carts can run beside the older Recover Cart Sales module. Recover Cart Sales sends by hand, to customers with an account; Abandoned Carts sends automatically and reaches guests too. If you use both, be careful not to email the same customer from each.</p>
+
+<h2 id="pro">Abandoned Carts Pro</h2>
+<p>The paid add-on adds a series of up to three reminders on your own timing (for example 1 hour, 1 day and 3 days), a single-use coupon in the last one, and a recovered-revenue report. It needs this plugin installed.</p>
+
+<h2 id="customizing">Customizing</h2>
+<ul>
+<li><strong>Wording:</strong> every word of the email and pages is in <code>catalog/includes/languages/english/extra_definitions/lang.abandoned_carts.php</code>. Copy a constant into your own override language file to change it.</li>
+<li><strong>The unsubscribe page:</strong> copy <code>tpl_abandoned_cart_default.php</code> into your template's <code>templates</code> folder.</li>
+<li><strong>The email's look:</strong> it uses your store's email template (<code>email/email_template_default.html</code>), or Preview Email Pro if you have it.</li>
+</ul>
+
+<h2 id="upgrading">Upgrading</h2>
+<p>Upload the new version's folder beside the old one and click <strong>Upgrade</strong> in Plugin Manager. Your settings, records, scheduler key and link secret are kept.</p>
+
+<h2 id="uninstalling">Uninstalling</h2>
+<p>Click <strong>Uninstall</strong> in Plugin Manager. With <em>Delete Cart Records on Uninstall?</em> false (the default), the records, the unsubscribe list, the scheduler key and the link secret are kept, so a later install picks up where it left off and links in emails already sent still work. With it true, all of it is removed. Remove the cron job too.</p>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+<table>
+<thead><tr><th>What you see</th><th>What to check</th></tr></thead>
+<tbody>
+<tr><td>No reminders go out</td><td>Customers &gt; Abandoned Carts shows when the scheduler last ran. Click <strong>Send Due Reminders Now</strong> and read the report. Check Send Reminder E-Mails? and Send E-Mails.</td></tr>
+<tr><td>The scheduler says Forbidden</td><td>The key in your cron job doesn't match the Scheduler Key. Copy the address again from Scheduler Setup.</td></tr>
+<tr><td>A cart shows <em>Not Emailed</em></td><td>Its history says why: a guest with guests off, not a newsletter subscriber, under the minimum value, or stopped by an admin.</td></tr>
+<tr><td>Guests are never recorded</td><td>Guest checkout must be One Page Checkout's, and the guest must click Save on their contact details.</td></tr>
+<tr><td>"could not be sent" in the report</td><td>Zen Cart couldn't send the email. Check your email settings; the reminder is retried an hour later.</td></tr>
+</tbody>
+</table>
+
+<h2 id="support">Support and license</h2>
+<p>Abandoned Carts is free software under the GNU General Public License v2. Support is through the Zen Cart forum and <a href="https://myzencartzone.com">myzencartzone.com</a>.</p>
+
+</body>
+</html>

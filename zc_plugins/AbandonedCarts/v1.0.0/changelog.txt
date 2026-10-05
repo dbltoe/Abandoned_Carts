@@ -1,0 +1,21 @@
+Abandoned Carts -- changelog
+============================
+
+v1.0.0
+------
+The first release (2026-10-05).
+
+- Records a cart once the shopper can be emailed: a customer with an
+  account, or a One Page Checkout guest who saved their contact details.
+  Anonymous carts are never stored.
+- One automatic reminder per cart, a set number of hours after the last
+  cart change, sent by a scheduler run from cron every 15 minutes.
+- Checks before each send: too old, unsubscribed, ordered since (any
+  payment path), guest and newsletter-only settings, minimum value, and a
+  wait while the shopper is still browsing.
+- Return to Your Cart restores the exact cart; one-click unsubscribe;
+  your postal address on every email.
+- Customers > Abandoned Carts: scheduler health, a 30-day summary, every
+  cart's items and history, Stop Reminders.
+- Records deleted after Keep Cart Records days.
+- Preview Email definition for the reminder.
