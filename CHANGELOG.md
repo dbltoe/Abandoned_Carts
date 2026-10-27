@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.0.3] - 2026-10-27
+
+Plugin Manager only. Nothing changes on the storefront, in the emails or in the settings.
+
+### Changed
+
+- New Settings button in Plugin Manager. Once the plugin is installed, its info panel has a Settings button that opens Configuration > Abandoned Carts directly. It isn't shown before Install or after Uninstall, and it works on every supported release (v1.5.8 through v3.0.0): the installer saves the panel again at Install, Upgrade and Uninstall, because v1.5.8, v2.0 and v2.1 otherwise keep the panel they saw first.
+- The buttons are one row: ReadMe | Settings | Forum Thread | GitHub. "Read Me" is now "ReadMe" and "Forum Support Thread" is now "Forum Thread". The buttons are a little narrower (8px side padding, 4px gaps), so all four fit on one line from a 1366px-wide window up and the Author line stays where it was.
+
 ## [1.0.2] - 2026-10-05
 
 ### Added
@@ -40,6 +49,7 @@ First release.
 - Preview Email definition for the reminder.
 - Hooks for Abandoned Carts Pro: up to three reminders, step wording, a coupon (`NOTIFY_ABANDONED_CARTS_BEFORE_COMPOSE`, `NOTIFY_ABANDONED_CARTS_SCHEDULER_END`).
 
+[1.0.3]: https://github.com/dbltoe/Abandoned_Carts/releases/tag/v1.0.3
 [1.0.2]: https://github.com/dbltoe/Abandoned_Carts/releases/tag/v1.0.2
 [1.0.1]: https://github.com/dbltoe/Abandoned_Carts/releases/tag/v1.0.1
 [1.0.0]: https://github.com/dbltoe/Abandoned_Carts/releases/tag/v1.0.0

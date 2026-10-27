@@ -23,7 +23,7 @@ if (!defined('IS_ADMIN_FLAG')) {
 
 class AbandonedCartsCore
 {
-    public const VERSION = 'v1.0.2';
+    public const VERSION = 'v1.0.3';
 
     /** The zen_mail() module name: our own, so the email observers touch only our mail. */
     public const MAIL_MODULE = 'abandoned_carts';

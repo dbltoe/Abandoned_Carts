@@ -1,6 +1,18 @@
 Abandoned Carts -- changelog
 ============================
 
+v1.0.3
+------
+- New: a Settings button in Plugin Manager. Once the plugin is
+  installed, its info panel has a Settings button that opens
+  Configuration > Abandoned Carts. The installer saves the panel
+  again at Install, Upgrade and Uninstall, because v1.5.8, v2.0 and
+  v2.1 otherwise keep the panel they saw first.
+- The buttons are one row: ReadMe | Settings | Forum Thread |
+  GitHub ("Read Me" is now "ReadMe", "Forum Support Thread" is now
+  "Forum Thread"), a little narrower so all four fit on one line.
+- Plugin Manager only; no storefront, email or settings change.
+
 v1.0.2
 ------
 - New: Ask Guests Before Reminding? (off). When on, One Page

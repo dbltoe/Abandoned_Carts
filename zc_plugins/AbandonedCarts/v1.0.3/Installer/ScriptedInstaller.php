@@ -31,6 +31,9 @@ class ScriptedInstaller extends ScriptedInstallBase
 {
     public const CONFIG_GROUP_TITLE = 'Abandoned Carts';
 
+    /** plugin_control.unique_key: the zc_plugins folder name. */
+    public const PLUGIN_KEY = 'AbandonedCarts';
+
     public const ADMIN_PAGE_KEYS = ['configAbandonedCarts', 'customersAbandonedCarts'];
 
     /** Settings an uninstall that keeps the data also keeps: the cron job and old email links carry them. */
@@ -97,6 +100,7 @@ class ScriptedInstaller extends ScriptedInstallBase
         }
 
         $this->acLog('Abandoned Carts: installed/upgraded.');
+        $this->acRefreshPluginDescription();
         return true;
     }
 
@@ -134,7 +138,40 @@ class ScriptedInstaller extends ScriptedInstallBase
         $this->executeInstallerSql("DELETE FROM " . TABLE_CONFIGURATION . " WHERE " . $keep . "configuration_key IN ('" . implode("', '", $ours) . "')");
 
         $this->acLog('Abandoned Carts: uninstalled' . ($deleteData ? ', data deleted.' : ', cart records kept.'));
+        $this->acRefreshPluginDescription();
         return true;
+    }
+
+    /**
+     * Save the manifest's description again, now that the Settings page has
+     * been registered (install, upgrade) or removed (uninstall).
+     *
+     * Needed on v1.5.8, v2.0 and v2.1, which store plugin_control.description
+     * only when Plugin Manager first sees the plugin, before Install, so the
+     * Settings button (built in manifest.php from the registered admin page)
+     * would never appear there. v2.2 and later rewrite the description from
+     * the manifest on every Plugin Manager visit, so this is a no-op there in
+     * effect. Core's own install/uninstall step changes only status and
+     * version, so this description stays.
+     *
+     * @return bool
+     */
+    protected function acRefreshPluginDescription()
+    {
+        if (!defined('TABLE_PLUGIN_CONTROL')) {
+            return true;
+        }
+        $manifest = require dirname(__DIR__) . '/manifest.php';
+        if (!is_array($manifest) || !isset($manifest['pluginDescription'])) {
+            return true;
+        }
+
+        return $this->executeInstallerSql(
+            "UPDATE " . TABLE_PLUGIN_CONTROL . "
+                SET description = '" . $this->dbConn->prepare_input($manifest['pluginDescription']) . "'
+              WHERE unique_key = '" . $this->dbConn->prepare_input(self::PLUGIN_KEY) . "'
+              LIMIT 1"
+        );
     }
 
     /* ----------------------------------------------------------------- *
