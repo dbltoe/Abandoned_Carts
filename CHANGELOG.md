@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.4] - 2026-11-11
+
+Nothing changes on the storefront, in the emails or in the settings.
+
+### Changed
+
+- **License: GNU General Public License, version 3** (was version 2).
+- **readme.html is replaced by README.md.** The ReadMe button in Plugin Manager opens it inside the admin, for superusers only, in its own window (`index.php?cmd=abandoned_carts_readme`); it is no longer a public file under `zc_plugins/`. The same README.md is at the root of the download.
+
+Upgrading: put the v1.0.4 folder beside the old one and click **Upgrade** in Admin > Modules > Plugin Manager. Your settings, records, scheduler key and link secret are kept.
+
 ## [1.0.3] - 2026-10-27
 
 Plugin Manager only. Nothing changes on the storefront, in the emails or in the settings.
@@ -49,6 +60,7 @@ First release.
 - Preview Email definition for the reminder.
 - Hooks for Abandoned Carts Pro: up to three reminders, step wording, a coupon (`NOTIFY_ABANDONED_CARTS_BEFORE_COMPOSE`, `NOTIFY_ABANDONED_CARTS_SCHEDULER_END`).
 
+[1.0.4]: https://github.com/dbltoe/Abandoned_Carts/releases/tag/v1.0.4
 [1.0.3]: https://github.com/dbltoe/Abandoned_Carts/releases/tag/v1.0.3
 [1.0.2]: https://github.com/dbltoe/Abandoned_Carts/releases/tag/v1.0.2
 [1.0.1]: https://github.com/dbltoe/Abandoned_Carts/releases/tag/v1.0.1
