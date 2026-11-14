@@ -6,7 +6,6 @@ Nothing changes on the storefront, in the emails or in the settings.
 
 ### Changed
 
-- **License: GNU General Public License, version 3** (was version 2).
 - **readme.html is replaced by README.md.** The ReadMe button in Plugin Manager opens it inside the admin, for superusers only, in its own window (`index.php?cmd=abandoned_carts_readme`); it is no longer a public file under `zc_plugins/`. The same README.md is at the root of the download.
 
 Upgrading: put the v1.0.4 folder beside the old one and click **Upgrade** in Admin > Modules > Plugin Manager. Your settings, records, scheduler key and link secret are kept.

@@ -1,6 +1,6 @@
 # Abandoned Carts
 
-Version 1.0.4 · Zen Cart 1.5.8 through 3.0.0 · PHP 7.4 through 8.5 · GPL v3 · by My Zen Cart Host (dbltoe)
+Version 1.0.4 · Zen Cart 1.5.8 through 3.0.0 · PHP 7.4 through 8.5 · GPL v2 · by My Zen Cart Host (dbltoe)
 
 Emails shoppers who left items in their cart, automatically, with a link that puts the cart back exactly as they left it.
 
@@ -167,7 +167,7 @@ Upload the new version's folder beside the old one and click **Upgrade** in Plug
 
 From 1.0.0 or 1.0.1 to 1.0.2: the new setting *Ask Guests Before Reminding?* arrives off, so nothing changes until you turn it on. Records your settings already rule out (a guest with *E-Mail Guests?* false, for example) are deleted the next time the scheduler runs, where 1.0.1 kept them, marked Not Emailed, until *Keep Cart Records* ran out.
 
-From 1.0.2 to 1.0.3, only the plugin's panel in Plugin Manager changes. From 1.0.3 to 1.0.4, the plugin moves to the GNU General Public License, version 3, and this guide replaces the old HTML readme: the ReadMe button in Plugin Manager now opens it inside the admin, for superusers, in its own window. Nothing changes on the storefront, in the emails or in the settings.
+From 1.0.2 to 1.0.3, only the plugin's panel in Plugin Manager changes. From 1.0.3 to 1.0.4, this guide replaces the old HTML readme: the ReadMe button in Plugin Manager now opens it inside the admin, for superusers, in its own window. Nothing changes on the storefront, in the emails or in the settings.
 
 ## Uninstalling
 
@@ -189,8 +189,8 @@ Support is through the Abandoned Carts support thread on the Zen Cart forum (htt
 
 ## Changelog
 
-See `CHANGELOG.md`. Version 1.0.4 moves the plugin to the GNU General Public License, version 3, and replaces the old HTML readme with this guide, opened from the ReadMe button in Plugin Manager.
+See `CHANGELOG.md`. Version 1.0.4 replaces the old HTML readme with this guide, opened from the ReadMe button in Plugin Manager.
 
 ## License
 
-Abandoned Carts is free software under the GNU General Public License, version 3 (https://www.gnu.org/licenses/gpl-3.0.html); the full text is in `LICENSE`. Copyright © 2026 My Zen Cart Host (dbltoe).
+Abandoned Carts is free software under the GNU General Public License, version 2 (https://www.gnu.org/licenses/old-licenses/gpl-2.0.html); the full text is in `LICENSE`. Copyright © 2026 My Zen Cart Host (dbltoe).
