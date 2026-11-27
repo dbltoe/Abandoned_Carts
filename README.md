@@ -200,4 +200,4 @@ See `CHANGELOG.md`. Version 1.0.4 replaces the old HTML readme with this guide, 
 
 ## License
 
-Abandoned Carts is free software under the GNU General Public License, version 2 (https://www.gnu.org/licenses/old-licenses/gpl-2.0.html); the full text is in `LICENSE`. Copyright © 2026 My Zen Cart Host (dbltoe).
+Abandoned Carts is free software under the GNU General Public License, version 2 (https://www.gnu.org/licenses/old-licenses/gpl-2.0.html); the full text is in `LICENSE`. Copyright © 2026 myZenCartZone.com (dbltoe).
