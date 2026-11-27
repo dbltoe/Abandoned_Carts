@@ -187,6 +187,13 @@ Click **Uninstall** in Plugin Manager. With *Delete Cart Records on Uninstall?* 
 
 Support is through the Abandoned Carts support thread on the Zen Cart forum (https://www.zen-cart.com/threads/207392), which is also linked from the plugin's Plugin Manager panel, and myzencartzone.com (https://myzencartzone.com). The source, releases and issue tracker are on GitHub (https://github.com/dbltoe/Abandoned_Carts). The download's `docs` folder has more on installing, every setting, customizing and compatibility.
 
+## Donations
+
+This plugin is free. If it has saved you time or money, a donation is always welcome.
+
+- Donate to JEANDRET, who maintains this plugin: https://myzencartzone.com/index.php?main_page=page&id=215
+- Donate to Zen Cart, the free, open-source software this plugin runs on: https://www.zen-cart.com/donate
+
 ## Changelog
 
 See `CHANGELOG.md`. Version 1.0.4 replaces the old HTML readme with this guide, opened from the ReadMe button in Plugin Manager.
