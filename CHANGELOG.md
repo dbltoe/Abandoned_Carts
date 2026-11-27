@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.0.4] - 2026-11-11
+## [1.0.4] - 2026-11-27
 
 On Zen Cart 2.1 and later nothing changes on the storefront, in the emails or in the settings.
 

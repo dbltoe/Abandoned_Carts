@@ -3,7 +3,7 @@ Abandoned Carts -- changelog
 
 v1.0.4
 ------
-Released 2026-11-11.
+Released 2026-11-27.
 
 - readme.html is replaced by README.md. The ReadMe button in Plugin
   Manager opens it inside the admin, for superusers only, in its own
