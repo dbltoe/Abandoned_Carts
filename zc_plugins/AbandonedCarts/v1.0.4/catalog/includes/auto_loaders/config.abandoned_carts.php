@@ -20,6 +20,9 @@ if (!defined('IS_ADMIN_FLAG')) {
 $autoLoadConfig[0][] = [
     'autoType' => 'class',
     'loadFile' => 'observers/class.abandoned_carts_cart.php',
+    // Zen Cart 2.0.x never finds a plugin's class file without this: it starts from
+    // the store's absolute classes folder and then puts the plugin's folder in front.
+    'classPath' => DIR_WS_CLASSES,
 ];
 $autoLoadConfig[139][] = [
     'autoType' => 'classInstantiate',

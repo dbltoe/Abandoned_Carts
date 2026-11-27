@@ -2,7 +2,11 @@
 
 ## [1.0.4] - 2026-11-11
 
-Nothing changes on the storefront, in the emails or in the settings.
+On Zen Cart 2.1 and later nothing changes on the storefront, in the emails or in the settings.
+
+### Fixed
+
+- **Zen Cart 2.0.x: the storefront failed with the plugin installed.** Every storefront page answered HTTP 500 (`Class "AbandonedCartsCartObserver" not found` in the debug log), because Zen Cart 2.0.x never loaded the cart observer's file. The admin was not affected. Every earlier version, 1.0.0 through 1.0.3, has this fault on Zen Cart 2.0.x; Zen Cart 2.1 and later were never affected.
 
 ### Changed
 

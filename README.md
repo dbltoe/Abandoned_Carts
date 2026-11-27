@@ -167,7 +167,7 @@ Upload the new version's folder beside the old one and click **Upgrade** in Plug
 
 From 1.0.0 or 1.0.1 to 1.0.2: the new setting *Ask Guests Before Reminding?* arrives off, so nothing changes until you turn it on. Records your settings already rule out (a guest with *E-Mail Guests?* false, for example) are deleted the next time the scheduler runs, where 1.0.1 kept them, marked Not Emailed, until *Keep Cart Records* ran out.
 
-From 1.0.2 to 1.0.3, only the plugin's panel in Plugin Manager changes. From 1.0.3 to 1.0.4, this guide replaces the old HTML readme: the ReadMe button in Plugin Manager now opens it inside the admin, for superusers, in its own window. Nothing changes on the storefront, in the emails or in the settings.
+From 1.0.2 to 1.0.3, only the plugin's panel in Plugin Manager changes. From 1.0.3 to 1.0.4, this guide replaces the old HTML readme: the ReadMe button in Plugin Manager now opens it inside the admin, for superusers, in its own window. Version 1.0.4 also fixes Zen Cart 2.0.x, where every storefront page failed with an earlier version installed. On Zen Cart 2.1 and later nothing changes on the storefront, in the emails or in the settings.
 
 ## Uninstalling
 

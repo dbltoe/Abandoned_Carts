@@ -8,7 +8,11 @@ Released 2026-11-11.
 - readme.html is replaced by README.md. The ReadMe button in Plugin
   Manager opens it inside the admin, for superusers only, in its own
   window; it is no longer a public file under zc_plugins/.
-- Nothing changes on the storefront, in the emails or in the settings.
+- Fixed, Zen Cart 2.0.x only: every storefront page failed (HTTP 500,
+  class AbandonedCartsCartObserver not found) with the plugin installed,
+  because Zen Cart 2.0.x never loaded the cart observer's file.
+- On Zen Cart 2.1 and later nothing changes on the storefront, in the
+  emails or in the settings.
 
 v1.0.3
 ------
